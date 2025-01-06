@@ -88,16 +88,16 @@ def initialize_wandb(
         results_dir = str(Path("./wandb").absolute())
 
     wandb_dir = results_dir
+
+    start_time = datetime.now().astimezone()
+    time_string = start_time.strftime("%y%m%d-%H%M%S")
+    wandb_name = f"{name}-{time_string}"
     if DistributedManager.is_initialized() and DistributedManager().distributed:
         if group is None:
             group = create_ddp_group_tag()
-        start_time = datetime.now().astimezone()
-        time_string = start_time.strftime("%m/%d/%y_%H:%M:%S")
-        wandb_name = f"{name}_Process_{DistributedManager().rank}_{time_string}"
+        wandb_name = f"{name}-{time_string}-Rank{DistributedManager().rank}"
     else:
-        start_time = datetime.now().astimezone()
-        time_string = start_time.strftime("%m/%d/%y_%H:%M:%S")
-        wandb_name = f"{name}_{time_string}"
+        wandb_name = f"{name}-{time_string}"
 
     if not os.path.exists(wandb_dir):
         os.makedirs(wandb_dir, exist_ok=True)

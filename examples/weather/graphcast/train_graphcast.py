@@ -330,10 +330,11 @@ def main(cfg: DictConfig) -> None:
 
     # initialize loggers
     if dist.rank == 0:
+        jobid = os.environ.get("SLURM_JOB_ID", None)
         initialize_wandb(
             project="GraphCast",
-            entity="Modulus",
-            name=f"GraphCast-{HydraConfig.get().job.name}",
+            entity=cfg.wb_entity,
+            name=f"{HydraConfig.get().job.name}-JobId{jobid}",
             group="group",
             mode=cfg.wb_mode,
         )  # Wandb logger
