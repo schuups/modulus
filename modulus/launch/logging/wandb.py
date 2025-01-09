@@ -88,19 +88,18 @@ def initialize_wandb(
         results_dir = str(Path("./wandb").absolute())
 
     wandb_dir = results_dir
-
-    start_time = datetime.now().astimezone()
-    time_string = start_time.strftime("%y%m%d-%H%M%S")
-    wandb_name = f"{name}-{time_string}"
+    
+    wandb_name = name
     if DistributedManager.is_initialized() and DistributedManager().distributed:
         if group is None:
             group = create_ddp_group_tag()
-        wandb_name = f"{name}-{time_string}-Rank{DistributedManager().rank}"
-    else:
-        wandb_name = f"{name}-{time_string}"
+        wandb_name += f"-Rank{DistributedManager().rank}"
 
     if not os.path.exists(wandb_dir):
         os.makedirs(wandb_dir, exist_ok=True)
+
+    start_time = datetime.now().astimezone()
+    time_string = start_time.strftime("%Y-%m-%d %H:%M:%S")
 
     wandb.init(
         project=project,
@@ -114,6 +113,7 @@ def initialize_wandb(
         group=group,
         save_code=save_code,
         id=wandb_id,
+        notes=f"Started at {time_string}",
     )
 
 
